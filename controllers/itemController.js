@@ -1,12 +1,45 @@
 var Item = require("../models/item");
+var Brand = require("../models/brand");
+var Category = require("../models/category");
 
-// Display list of all Items.
+var async = require("async");
+
 exports.index = function (req, res) {
-  res.send("NOT IMPLEMENTED: Site Home Page");
+  async.parallel(
+    {
+      item_count: function (callback) {
+        Item.countDocuments({}, callback); // Pass an empty object as match condition to find all documents of this collection
+      },
+      brand_count: function (callback) {
+        Brand.countDocuments({}, callback);
+      },
+
+      category_count: function (callback) {
+        Category.countDocuments({}, callback);
+      },
+    },
+    function (err, results) {
+      res.render("index", {
+        title: "Inventory Application",
+        error: err,
+        data: results,
+      });
+    }
+  );
 };
 
-exports.item_list = function (req, res) {
-  res.send("NOT IMPLEMENTED: Item list");
+exports.item_list = function (req, res, next) {
+  Item.find()
+    .populate("brand")
+    .populate("category")
+    .exec(function (err, list_items) {
+      if (err) {
+        return next(err);
+      }
+      //Successful, so render
+      console.log("success");
+      res.render("item_list", { title: "Item list", item_list: list_items });
+    });
 };
 
 // Display detail page for a specific Item.

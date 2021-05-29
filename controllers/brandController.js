@@ -1,8 +1,18 @@
+var Item = require("../models/item");
 var Brand = require("../models/brand");
+var Category = require("../models/category");
+
+var async = require("async");
 
 // Display list of all Brands.
-exports.brand_list = function (req, res) {
-  res.send("NOT IMPLEMENTED: Brand list");
+exports.brand_list = function (req, res, next) {
+  Brand.find().exec(function (err, list_brands) {
+    if (err) {
+      return next(err);
+    }
+    //Successful, so render
+    res.render("brand_list", { title: "Brand list", brand_list: list_brands });
+  });
 };
 
 // Display detail page for a specific Brand.
