@@ -1,6 +1,10 @@
 var Item = require("../models/item");
 
 // Display list of all Items.
+exports.index = function (req, res) {
+  res.send("NOT IMPLEMENTED: Site Home Page");
+};
+
 exports.item_list = function (req, res) {
   res.send("NOT IMPLEMENTED: Item list");
 };

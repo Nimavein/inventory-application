@@ -5,9 +5,6 @@ var brand_controller = require("../controllers/brandController");
 var category_controller = require("../controllers/categoryController");
 var item_controller = require("../controllers/itemController");
 
-// GET catalog home page.
-router.get("/", brand_controller.index);
-
 // GET request for creating a brand. NOTE This must come before routes that display brand (uses id).
 router.get("/brand/create", brand_controller.brand_create_get);
 
@@ -31,9 +28,6 @@ router.get("/brand/:id", brand_controller.brand_detail);
 
 // GET request for list of all brand items.
 router.get("/brands", brand_controller.brand_list);
-
-// GET catalog home page.
-router.get("/", category_controller.index);
 
 // GET request for creating a category. NOTE This must come before routes that display category (uses id).
 router.get("/category/create", category_controller.category_create_get);
