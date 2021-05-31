@@ -180,12 +180,69 @@ exports.brand_delete_post = function (req, res, next) {
   );
 };
 
-// Display Brand update form on GET.
-exports.brand_update_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: Brand update GET");
+// Display Brand update form on POST.
+exports.brand_update_get = function (req, res, next) {
+  Brand.findById(req.params.id, function (err, brand) {
+    if (err) {
+      return next(err);
+    }
+    if (Brand == null) {
+      // No results.
+      var err = new Error("Brand not found");
+      err.status = 404;
+      return next(err);
+    }
+    // Success.
+    res.render("brand_form", {
+      title: "Update Brand",
+      brand: brand,
+    });
+  });
 };
 
-// Handle Brand update on POST.
-exports.brand_update_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: Brand update POST");
-};
+// Display Brand update form on POST.
+exports.brand_update_post = [
+  // Validate and sanitze the name field.
+  body("name", "Brand name required").trim().isLength({ min: 1 }).escape(),
+  body("description", "Brand description required")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+    // Extract the validation errors from a request .
+    const errors = validationResult(req);
+
+    // Create a brand object with escaped and trimmed data (and the old id!)
+    var brand = new Brand({
+      name: req.body.name,
+      description: req.body.description,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values and error messages.
+      res.render("brand_form", {
+        title: "Update Brand",
+        brand: brand,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record.
+      Brand.findByIdAndUpdate(
+        req.params.id,
+        brand,
+        {},
+        function (err, thebrand) {
+          if (err) {
+            return next(err);
+          }
+          // Successful - redirect to brand detail page.
+          res.redirect(thebrand.url);
+        }
+      );
+    }
+  },
+];
