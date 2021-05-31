@@ -6,7 +6,7 @@ var ItemSchema = new Schema({
   name: { type: String, required: true, minLength: 2, maxLength: 60 },
   description: { type: String, required: true, maxLength: 200 },
   brand: { type: Schema.Types.ObjectId, ref: "Brand", default: "Other" },
-  category: [{ type: Schema.ObjectId, ref: "Category", required: true }],
+  category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
   price: { type: Number, required: true, min: 0 },
   number_in_stock: { type: Number, required: true, min: 0 },
 });
