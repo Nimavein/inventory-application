@@ -192,13 +192,32 @@ exports.item_create_post = [
 ];
 
 // Display Item delete form on GET.
-exports.item_delete_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: Item delete GET");
+exports.item_delete_get = function (req, res, next) {
+  Item.findById(req.params.id).exec(function (err, item) {
+    if (err) {
+      return next(err);
+    }
+    if (item == null) {
+      console.log("XD");
+      // No results.
+      res.redirect("/catalog/items");
+    }
+    // Successful, so render.
+    res.render("item_delete", { title: "Delete Item", item: item });
+  });
 };
 
 // Handle Item delete on POST.
-exports.item_delete_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: Item delete POST");
+exports.item_delete_post = function (req, res, next) {
+  // Assume valid Item id in field.
+  Item.findByIdAndRemove(req.body.id, function deleteItem(err) {
+    if (err) {
+      return next(err);
+    }
+    console.log("Success");
+    // Success, so redirect to list of Items.
+    res.redirect("/catalog/items");
+  });
 };
 
 // Display Item update form on GET.

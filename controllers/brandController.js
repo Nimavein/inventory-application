@@ -114,13 +114,70 @@ exports.brand_create_post = [
 ];
 
 // Display Brand delete form on GET.
-exports.brand_delete_get = function (req, res) {
-  res.send("NOT IMPLEMENTED: Brand delete GET");
+exports.brand_delete_get = function (req, res, next) {
+  async.parallel(
+    {
+      brand: function (callback) {
+        Brand.findById(req.params.id).exec(callback);
+      },
+      brand_items: function (callback) {
+        Item.find({ brand: req.params.id }).exec(callback);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      if (results.brand == null) {
+        // No results.
+        res.redirect("/catalog/brand");
+      }
+      // Successful, so render.
+      res.render("brand_delete", {
+        title: "Delete Brand",
+        brand: results.brand,
+        brand_items: results.brand_items,
+      });
+    }
+  );
 };
 
 // Handle Brand delete on POST.
-exports.brand_delete_post = function (req, res) {
-  res.send("NOT IMPLEMENTED: Brand delete POST");
+exports.brand_delete_post = function (req, res, next) {
+  async.parallel(
+    {
+      brand: function (callback) {
+        Brand.findById(req.body.brandid).exec(callback);
+      },
+      brands_books: function (callback) {
+        Item.find({ brand: req.body.brandid }).exec(callback);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      // Success
+      if (results.brands_books.length > 0) {
+        // brand has items. Render in same way as for GET route.
+        res.render("brand_delete", {
+          title: "Delete brand",
+          brand: results.brand,
+          brand_books: results.brands_books,
+        });
+        return;
+      } else {
+        // brand has no books. Delete object and redirect to the list of brands.
+        Brand.findByIdAndRemove(req.body.brandid, function deleteBrand(err) {
+          if (err) {
+            return next(err);
+          }
+          // Success - go to brand list
+          res.redirect("/catalog/brands");
+        });
+      }
+    }
+  );
 };
 
 // Display Brand update form on GET.

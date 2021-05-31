@@ -10,3 +10,7 @@ block content
   p #[strong Price:] $#{item.price}
   p #[strong Category:]
     a(href=item.category.url) #{item.category.name}
+
+  hr
+  p
+    a(href=item.url+'/delete') Delete item
